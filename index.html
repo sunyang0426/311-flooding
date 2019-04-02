@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>Toronto 311 calls</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+  <style>
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h2,
+h3 {
+  margin: 10px;
+  font-size: 1.2em;
+}
+
+h3 {
+  font-size: 1em;
+}
+
+p {
+  font-size: 0.85em;
+  margin: 10px;
+  text-align: left;
+}
+
+/**
+* Create a position for the map
+* on the page */
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+/**
+* Set rules for how the map overlays
+* (information box and legend) will be displayed
+* on the page. */
+.map-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #D3D3D3;
+  margin-right: 20px;
+  font-family: Arial, sans-serif;
+  overflow: auto;
+  border-radius: 3px;
+}
+
+#features {
+  top: 0;
+  height: 200px;
+  margin-top: 20px;
+  width: 250px;
+}
+
+#legend {
+  padding: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  line-height: 18px;
+  height: 100px;
+  margin-bottom: 40px;
+  width: 100px;
+}
+
+.legend-key {
+  display: inline-block;
+  border-radius: 20%;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+}
+  </style>
+</head>
+<body>
+
+<div id='map'></div>
+<div class='map-overlay' id='features'><h2>Toronto 311 flood complaints</h2><div id='pd'><p>Hover over a neiborhood!</p></div></div>
+<div class='map-overlay' id='legend'></div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1Ijoic3VueWFuZzA0MjYiLCJhIjoiY2l2Mmh5Y2dxMDF1NzJ5cGhhazU5a3h1ciJ9.LChXuAo-sW2qS33wpha-rw';
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/sunyang0426/cjtz20bej073h1fth72q5j3lu',
+  center: [-79.341459, 43.713307],
+  zoom: 10.5
+});
+
+map.on('load', function() {
+ var layers = ['28-114', '141-171', '171-252', '252-305', '305+'];
+ var colors = ['#f1f3f4', '#b2eaf5', '#78bdf2', '#2181ca', '#1a28a8'];
+
+ for (i = 0; i < layers.length; i++) {
+  var layer = layers[i];
+  var color = colors[i];
+  var item = document.createElement('div');
+  var key = document.createElement('span');
+  key.className = 'legend-key';
+  key.style.backgroundColor = color;
+
+  var value = document.createElement('span');
+  value.innerHTML = layer;
+  item.appendChild(key);
+  item.appendChild(value);
+  legend.appendChild(item);
+}
+});
+
+map.on('mousemove', function(e) {
+  var features = map.queryRenderedFeatures(e.point, {
+    layers: ['flooding-zip-c5brau']
+  });
+
+  if (features.length > 0) {
+    document.getElementById('pd').innerHTML = '<h3><strong>First 3-digit postal code: '+ features[0].properties.CFSAUID + '</strong></h3><p><strong><em>' + features[0].properties.calls_ + '</strong> calls from this neighorhood were received by Toronto 311 from 2010 to Feburary, 2019.</em></p>';
+  } else {
+    document.getElementById('pd').innerHTML = '<p>Hover over a state!</p>';
+  }
+});
+
+</script>
+
+</body>
+</html>
